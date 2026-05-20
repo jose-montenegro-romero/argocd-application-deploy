@@ -1,0 +1,10 @@
+replicaCount: 2  # Vamos a ponerle 2 réplicas para diferenciarlo de Nginx
+
+image:
+  repository: httpd
+  tag: alpine
+
+service:
+  type: ClusterIP
+  port: 80         # Puerto del Service de Kubernetes
+  targetPort: 80   # Puerto que expone el contenedor de Apache
