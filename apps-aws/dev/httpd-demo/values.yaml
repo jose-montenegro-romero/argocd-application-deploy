@@ -33,7 +33,7 @@ ingress:
     alb.ingress.kubernetes.io/target-type: ip
     
     # Puertos en los que escuchará el ALB
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     
     # # Redirección automática de HTTP a HTTPS
     # alb.ingress.kubernetes.io/ssl-redirect: '443'
@@ -45,8 +45,7 @@ ingress:
     # alb.ingress.kubernetes.io/group.name: "apps-transversales"
     
   hosts:
-    - host: mi-app.ejemplo.com
-      paths:
+    - paths:
         - path: /
           pathType: Prefix
 
