@@ -1,0 +1,59 @@
+replicaCount: 2
+
+image:
+  repository: nginx
+  tag: alpine
+
+# # 1. Configuración del Service Account con anotaciones IRSA (IAM Roles for Service Accounts)
+# serviceAccount:
+#   create: true
+#   automount: true
+#   annotations:
+#     # Permite al Pod asumir un rol de AWS IAM para consumir servicios como S3, Secrets Manager, etc.
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/mi-app-servicio-role
+#   name: "mi-app-servicio-sa"
+
+# 2. Configuración del Service
+# Nota: Usamos ClusterIP porque el Ingress de AWS (ALB) en modo IP enviará el tráfico directamente a los Pods.
+service:
+  type: ClusterIP
+  port: 80
+
+# 3. Configuración del Ingress para AWS Load Balancer Controller (ALB)
+ingress:
+  enabled: true
+  className: "alb" # Clase del controlador de AWS Load Balancer
+  annotations:
+    # Define si el balanceador es público (internet-facing) o interno (internal)
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    
+    # "ip" rutea el tráfico directamente a las IPs de los Pods (Recomendado en EKS). 
+    # "instance" rutea a los NodePorts de las instancias EC2 (requiere service.type: NodePort).
+    alb.ingress.kubernetes.io/target-type: ip
+    
+    # Puertos en los que escuchará el ALB
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    
+    # # Redirección automática de HTTP a HTTPS
+    # alb.ingress.kubernetes.io/ssl-redirect: '443'
+    
+    # # Certificado SSL gestionado en AWS Certificate Manager (ACM)
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/abc-123-xyz
+    
+    # (Opcional) Agrupar múltiples ingress en un único balanceador físico para ahorrar costos
+    # alb.ingress.kubernetes.io/group.name: "apps-transversales"
+    
+  hosts:
+    - paths:
+        - path: /
+          pathType: Prefix
+
+# Recursos de los contenedores
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
