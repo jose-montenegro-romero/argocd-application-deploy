@@ -1,0 +1,32 @@
+replicaCount: 2
+
+image:
+  repository: traefik/whoami
+  tag: latest
+
+# 2. Configuración del Service
+service:
+  type: ClusterIP
+  port: 80
+
+# 3. Configuración del Ingress para AWS Load Balancer Controller (ALB)
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  hosts:
+    - paths:
+        - path: /
+          pathType: Prefix
+
+# Recursos de los contenedores
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
