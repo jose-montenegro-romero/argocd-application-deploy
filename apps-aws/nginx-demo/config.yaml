@@ -1,5 +1,5 @@
 deploy_config:
   namespace: test
-  dev: false
+  dev: true
   uat: false
   prod: false
